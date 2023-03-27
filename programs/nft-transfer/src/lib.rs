@@ -29,17 +29,6 @@ pub mod transfer_tokens {
         )
     }
 
-    pub fn mint_spl(
-        ctx: Context<MintSpl>, 
-        quantity: u64,
-    ) -> Result<()> {
-
-        mint_spl::mint_spl(
-            ctx, 
-            quantity,
-        )
-    }
-
     pub fn mint_nft(
         ctx: Context<MintNft>, 
     ) -> Result<()> {

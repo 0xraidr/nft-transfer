@@ -15,41 +15,6 @@ describe("Transfer Tokens", () => {
 
   const recipientWallet: anchor.web3.Keypair = anchor.web3.Keypair.generate();
 
-  it("Create an SPL Token!", async () => {
-    const metadataAddress = anchor.web3.PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("metadata"),
-        TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-        tokenMintKeypair.publicKey.toBuffer(),
-      ],
-      TOKEN_METADATA_PROGRAM_ID
-    )[0];
-
-    const sx = await program.methods
-      .createToken(
-        "Solana Gold",
-        "GOLDSOL",
-        "https://raw.githubusercontent.com/solana-developers/program-examples/new-examples/tokens/tokens/.assets/spl-token.json",
-        9
-      )
-      .accounts({
-        metadataAccount: metadataAddress,
-        mintAccount: tokenMintKeypair.publicKey,
-        mintAuthority: payer.publicKey,
-        payer: payer.publicKey,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        systemProgram: anchor.web3.SystemProgram.programId,
-        tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
-        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-      })
-      .signers([tokenMintKeypair, payer.payer])
-      .rpc();
-
-    console.log("Success!");
-    console.log(`   Mint Address: ${tokenMintKeypair.publicKey}`);
-    console.log(`   Tx Signature: ${sx}`);
-  });
-
   it("Create an NFT!", async () => {
     const metadataAddress = anchor.web3.PublicKey.findProgramAddressSync(
       [
@@ -82,33 +47,6 @@ describe("Transfer Tokens", () => {
 
     console.log("Success!");
     console.log(`   Mint Address: ${nftMintKeypair.publicKey}`);
-    console.log(`   Tx Signature: ${sx}`);
-  });
-
-  it("Mint some tokens to your wallet!", async () => {
-    const associatedTokenAccountAddress =
-      await anchor.utils.token.associatedAddress({
-        mint: tokenMintKeypair.publicKey,
-        owner: payer.publicKey,
-      });
-
-    const sx = await program.methods
-      .mintSpl(new anchor.BN(150))
-      .accounts({
-        associatedTokenAccount: associatedTokenAccountAddress,
-        mintAccount: tokenMintKeypair.publicKey,
-        mintAuthority: payer.publicKey,
-        payer: payer.publicKey,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        systemProgram: anchor.web3.SystemProgram.programId,
-        tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
-        associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
-      })
-      .signers([payer.payer])
-      .rpc();
-
-    console.log("Success!");
-    console.log(`   Mint Address: ${tokenMintKeypair.publicKey}`);
     console.log(`   Tx Signature: ${sx}`);
   });
 
@@ -169,40 +107,6 @@ describe("Transfer Tokens", () => {
       )
     );
     console.log(`Recipient Pubkey: ${recipientWallet.publicKey}`);
-  });
-
-  it("Transfer some tokens to another wallet!", async () => {
-    const fromAssociatedTokenAccountAddress =
-      await anchor.utils.token.associatedAddress({
-        mint: tokenMintKeypair.publicKey,
-        owner: payer.publicKey,
-      });
-    const toAssociatedTokenAccountAddress =
-      await anchor.utils.token.associatedAddress({
-        mint: tokenMintKeypair.publicKey,
-        owner: recipientWallet.publicKey,
-      });
-
-    const sx = await program.methods
-      .transferTokens(new anchor.BN(150))
-      .accounts({
-        mintAccount: tokenMintKeypair.publicKey,
-        fromAssociatedTokenAccount: fromAssociatedTokenAccountAddress,
-        owner: payer.publicKey,
-        toAssociatedTokenAccount: toAssociatedTokenAccountAddress,
-        recipient: recipientWallet.publicKey,
-        payer: payer.publicKey,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        systemProgram: anchor.web3.SystemProgram.programId,
-        tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
-        associatedTokenProgram: ASSOCIATED_PROGRAM_ID,
-      })
-      .signers([payer.payer])
-      .rpc();
-
-    console.log("Success!");
-    console.log(`   Mint Address: ${tokenMintKeypair.publicKey}`);
-    console.log(`   Tx Signature: ${sx}`);
   });
 
   it("Transfer the NFT to another wallet!", async () => {
